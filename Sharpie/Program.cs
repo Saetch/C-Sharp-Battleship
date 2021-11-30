@@ -6,7 +6,7 @@ namespace Sharpie
     {
         static void Main(string[] args)
         {
-            const int size = 10000;
+            const int size = 20000;
 
             int[,] arr = new int[size,size];
             if (fillArray(arr, size))
@@ -23,14 +23,22 @@ namespace Sharpie
         static bool fillArray(int[,] arr, int size)
         {
             Random rnd = new Random(100);
-            for(int i=0;i< size; i++)
+            try
             {
-                for(int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
-                    arr[i, j] = rnd.Next()% 50;
+                    for (int j = 0; j < size; j++)
+                    {
+                        arr[i, j] = rnd.Next() % 50;
+                    }
                 }
             }
-            Console.WriteLine("Filled Array with values\n");
+            catch(Exception e)
+            {
+                return false;
+            }
+
+            Console.WriteLine("Filled Array with "+size*size+" values\n");
             return true;
         }
 
