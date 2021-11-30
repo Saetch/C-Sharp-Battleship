@@ -14,7 +14,15 @@ namespace Sharpie
             int exType = 0;
             if(args.Length > 0)
             {
-                exType = int.Parse(args[0]);
+                if(String.Equals(args[0], "-l"))
+                {
+                    exType = 1;
+                }               
+                if(String.Equals(args[0], "-c"))
+                {
+                    exType = 2;
+                }
+                
             }
 
             switch (exType)
