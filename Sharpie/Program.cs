@@ -69,7 +69,7 @@ namespace Sharpie
             {
                 for(int j =0; j < size; j++)
                 {
-                    if (arr[i, j] == 12) counter++;
+                    if (arr[j, i] == 12) counter++;
                 }
             }
             stopwatch.Stop();
