@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sharpie": {
+      "commandName": "Project",
+      "commandLineArgs": "-l"
+    }
+  }
+}
