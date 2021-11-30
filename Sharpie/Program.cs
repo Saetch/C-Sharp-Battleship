@@ -6,6 +6,35 @@ namespace Sharpie
     {
         static void Main(string[] args)
         {
+            
+            int exType = 0;
+            if(args.Length > 0)
+            {
+                exType = int.Parse(args[0]);
+            }
+
+            switch (exType)
+            {
+                case 0:
+                    justTestArrayColumRowO();
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                default:
+                    Console.Error.WriteLine("Switch-Case of type " + exType + " not implemented!\n");
+                    break;
+            }
+        }
+
+
+
+
+
+
+        static void justTestArrayColumRowO()
+        {
             const int size = 20000;
 
             int[,] arr = new int[size,size];
@@ -18,7 +47,6 @@ namespace Sharpie
             }
 
         }
-
 
         static bool fillArray(int[,] arr, int size)
         {
