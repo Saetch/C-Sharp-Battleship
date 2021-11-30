@@ -55,6 +55,7 @@ namespace Sharpie
                     if (arr[i, j] == 12) counter++;
                 }
             }
+
             stopwatch.Stop();
             Console.WriteLine("ElapsedTime for X->Y->Access: " + stopwatch.ElapsedMilliseconds+" ms. found "+counter+" hits \n");
 
