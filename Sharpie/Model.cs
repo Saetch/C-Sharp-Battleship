@@ -13,9 +13,10 @@ namespace Sharpie
 
         private bool InProgress;
         public bool Active { get; private set; } = false;
-        public int Width { get; private set; } = 0;
-        public int Height { get; private set; }=0;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         public Model(int widthV, int heightV) => (Width, Height) = (widthV, heightV);
+
 
         public bool CreateFields()
         {
