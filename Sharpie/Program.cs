@@ -22,7 +22,14 @@ namespace Sharpie
                 {
                     exType = 2;
                 }
-                
+                if (String.Equals(args[0], "-bl"))
+                {
+                    exType = 3;
+                }
+                if (String.Equals(args[0], "-bc"))
+                {
+                    exType = 4;
+                }
             }
 
             switch (exType)
@@ -36,9 +43,77 @@ namespace Sharpie
                 case 2:
                     launchTCPClient();
                     break;
+                case 3:
+                    BattleShipServer();
+                    break;
+                case 4:
+                    BattleShipClient();
+                    break;
                 default:
                     Console.Error.WriteLine("Switch-Case of type " + exType + " not implemented!\n");
                     break;
+            }
+
+            Console.WriteLine("Program exited ...");
+        }
+
+        static void BattleShipServer()
+        {
+            Console.WriteLine("Press any key to start ...!");
+            Console.ReadKey(false);
+
+
+            int w =0;
+            int h = 0;
+            while (w <6)
+            {
+                try
+                {
+                    Console.WriteLine("Enter Game Width, preferably >9:");
+                    w = int.Parse(Console.ReadLine());
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("{0}:Could not read input, try again!\n", e.GetType());
+                }
+            }
+            while (h < 6)
+            {
+                try
+                {
+                    Console.WriteLine("Enter Game Height, preferably >9:");
+                    h = int.Parse(Console.ReadLine());
+
+                }
+                catch (Exception e)
+                {
+                    
+                    Console.WriteLine("{0}:Could not read input, try again!\n",e.GetType());
+                }
+            }
+            string str;
+
+
+            str = Console.ReadKey(false).Key.ToString();
+            Console.WriteLine("str: {0}", str);
+            Model m = new(w, h);
+            m.CreateFields();
+            Controller Cntrl = new(m);
+
+            System.Threading.Thread.Sleep(8000);
+        }
+
+        static void BattleShipClient()
+        {
+
+        }
+
+        static void ClearConsoleInput()
+        {
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(false);
             }
         }
 

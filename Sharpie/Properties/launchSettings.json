@@ -2,7 +2,7 @@
   "profiles": {
     "Sharpie": {
       "commandName": "Project",
-      "commandLineArgs": "-l"
+      "commandLineArgs": "-bl"
     }
   }
 }
