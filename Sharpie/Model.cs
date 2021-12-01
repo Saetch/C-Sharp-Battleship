@@ -10,9 +10,11 @@ namespace Sharpie
     {
         private int[,] OwnField;
         private int[,] OpponentField;
-        bool Active = false;
-        private int Width { get; set; } = 0;
-        private int Height { get; set; }=0;
+
+        private bool InProgress;
+        public bool Active { get; private set; } = false;
+        public int Width { get; private set; } = 0;
+        public int Height { get; private set; }=0;
         public Model(int widthV, int heightV) => (Width, Height) = (widthV, heightV);
 
         public bool CreateFields()
@@ -30,11 +32,6 @@ namespace Sharpie
 
         }
 
-
-        public bool IsActive()
-        {
-            return Active;
-        }
     }
 
 

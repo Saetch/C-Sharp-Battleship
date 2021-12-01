@@ -11,7 +11,7 @@ namespace Sharpie
 
         public bool printToConsole(Model m)
         {
-            if (m.IsActive())
+            if (m.Active)
             {
                 return true;
             }
