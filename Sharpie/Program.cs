@@ -92,16 +92,13 @@ namespace Sharpie
                     Console.WriteLine("{0}:Could not read input, try again!\n",e.GetType());
                 }
             }
-            string str;
 
-
-            str = Console.ReadKey(false).Key.ToString();
-            Console.WriteLine("str: {0}", str);
             Model m = new(w, h);
             m.CreateFields();
-            Controller Cntrl = new(m);
+            Controller cntrl = new(m);
 
-            System.Threading.Thread.Sleep(8000);
+            cntrl.StartGameServer();
+            System.Threading.Thread.Sleep(2000);
         }
 
         static void BattleShipClient()

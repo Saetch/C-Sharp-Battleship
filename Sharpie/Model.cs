@@ -11,12 +11,24 @@ namespace Sharpie
         private int[,] OwnField;
         private int[,] OpponentField;
 
-        private bool InProgress;
         public bool Active { get; private set; } = false;
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public Model(int widthV, int heightV) => (Width, Height) = (widthV, heightV);
+        public Model(int widthV, int heightV) {
+            (Width, Height) = (widthV, heightV);
+            PlayersTurn = new Random().Next() %2;
+        }
 
+        public int PlayersTurn
+        {
+            get;
+            private set;
+        }
+
+        public void ForceTurn(int f)
+        {
+            PlayersTurn = f;
+        }
 
         public bool CreateFields()
         {
