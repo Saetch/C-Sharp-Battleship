@@ -31,8 +31,10 @@ namespace Sharpie
                     justTestArrayColumRowO();
                     break;
                 case 1:
+                    launchTCPServer();
                     break;
                 case 2:
+                    launchTCPClient();
                     break;
                 default:
                     Console.Error.WriteLine("Switch-Case of type " + exType + " not implemented!\n");
@@ -40,9 +42,101 @@ namespace Sharpie
             }
         }
 
+        static void launchTCPClient()
+        {
+            try
+            {
+                // Create a TcpClient.
+                // Note, for this client to work you need to have a TcpServer
+                // connected to the same address as specified by the server, port
+                // combination.
+                Int32 port = 13000;
+
+                //THIS IS HARDCODED FOR LOCALHOST, UPDATE IF NEEDED
+
+                TcpClient client = new TcpClient("127.0.0.1", port);
+
+                Console.Write("Connecting to Server ... ");
+                Console.WriteLine(" connected!");
+                NetworkStream stream = client.GetStream();
 
 
-        static void TCPServer()
+                string message;
+                bool run = true;
+                Int32 bytes =0;
+                while (run)
+                {
+                    message = Console.ReadLine();
+
+                    if (message == "disconnect" || message == "end")
+                    {
+                        run = false;
+                    }
+                    // Translate the passed message into ASCII and store it as a Byte array.
+                    Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+
+                    // Get a client stream for reading and writing.
+                    //  Stream stream = client.GetStream();
+
+                    try
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+                    catch (Exception e)
+                    {
+                        if (e.InnerException is System.IO.IOException)
+                        {
+                            Console.WriteLine("Connection closed!");
+                            run = false;
+                        }
+                    }
+            // Send the message to the connected TcpServer.
+
+            Console.WriteLine("Sent: {0}", message);
+
+                    // Receive the TcpServer.response.
+
+                    // Buffer to store the response bytes.
+                    data = new Byte[256];
+
+                    // String to store the response ASCII representation.
+                    String responseData = String.Empty;
+                    try { 
+                    // Read the first batch of the TcpServer response bytes.
+                    bytes = stream.Read(data, 0, data.Length);
+                    }
+                    catch(Exception e)
+                    {
+                        if (e.InnerException is System.IO.IOException)
+                        {
+                            Console.WriteLine("Connection closed!");
+                            run = false;
+                        }
+                    }
+                    responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                    Console.WriteLine("Received: {0}", responseData);
+                }
+
+
+                // Close everything.
+                stream.Close();
+                client.Close();
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+
+            Console.WriteLine("\n Press Enter to continue...");
+            Console.Read();
+        }
+
+
+        static void launchTCPServer()
         {
             {
                 TcpListener server = null;
@@ -62,11 +156,12 @@ namespace Sharpie
                     // Buffer for reading data
                     Byte[] bytes = new Byte[256];
                     String data = null;
-
+                    Random rnd = new Random();
                     // Enter the listening loop.
                     while (run)
                     {
                         Console.Write("Waiting for a connection... ");
+                        bool active = true;
 
                         // Perform a blocking call to accept requests.
                         // You could also use server.AcceptSocket() here.
@@ -81,7 +176,7 @@ namespace Sharpie
                         int messageLength;
 
                         // Loop to receive all the data sent by the client.
-                        while ((messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
+                        while (active && (messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
                         {
                             // Translate data bytes to a ASCII string.
                             data = System.Text.Encoding.ASCII.GetString(bytes, 0, messageLength);
@@ -90,13 +185,30 @@ namespace Sharpie
                             // Process the data sent by the client.
                             data = data;
 
-                            byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+                            //randomize  string somewhat
+                            string data2 = "";
+
+                            for(int i =0; i < data.Length; i++)
+                            {
+                                data2 += data[rnd.Next() % data.Length];
+                            }
+
+                            byte[] msg = System.Text.Encoding.ASCII.GetBytes(data2);
 
                             // Send back a response.
                             stream.Write(msg, 0, msg.Length);
-                            Console.WriteLine("Sent: {0}", data);
+                            Console.WriteLine("Sent: {0}", data2);
+                            if (data == "end")
+                            {
+                                run = active = false;
+                            }
+                            if(data == "disconnect")
+                            {
+                                active = false;
+                            }
                         }
-                        Console.WriteLine(data+" received");
+
+                        stream.Close();
                         // Shutdown and end connection
                         client.Close();
                     }
