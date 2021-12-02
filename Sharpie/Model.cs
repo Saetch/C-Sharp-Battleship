@@ -30,6 +30,11 @@ namespace Sharpie
             PlayersTurn = f;
         }
 
+        public void ForceWidthHeight(int x, int y)
+        {
+            Width = x;
+            Height = y;
+        }
         public bool CreateFields()
         {
             if (Width < 6 || Height < 6) return false;
