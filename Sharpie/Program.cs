@@ -103,6 +103,15 @@ namespace Sharpie
 
         static void BattleShipClient()
         {
+            Console.WriteLine("Enter Server IP: ");
+            string ip = Console.ReadLine();
+            IPAddress ipAddress = IPAddress.Parse(ip);
+            Model m = new(10, 10);
+
+            Controller cntrl = new(m);
+            cntrl.StartGameClient(ipAddress);
+
+            System.Threading.Thread.Sleep(2000);
 
         }
 

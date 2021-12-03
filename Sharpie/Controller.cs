@@ -83,6 +83,11 @@ namespace Sharpie
 
             SendMessage(stream, "B_FORCETURN:" + Model.PlayersTurn);
 
+            Console.WriteLine("Set Turn to: {0}", Model.PlayersTurn);
+          
+            ConsoleWriter cnsl = new();
+
+            cnsl.printToConsole(Model);
 
             // Loop to receive all the data sent by the client.
             while (Model.Active && (messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
@@ -103,10 +108,54 @@ namespace Sharpie
 
         internal void StartGameClient(IPAddress targetAddress)
         {
+            Console.Write("Connecting ... ");
+            TcpClient cl = new TcpClient(targetAddress.ToString(), 13000);
+            Console.Write("connected!\n");
+
+            NetworkStream stream = cl.GetStream();
+
+            CommunicationLoopC(stream);
 
         }
 
-        private void CommunicationLoopC()
+
+        private void CommunicationLoopC(NetworkStream stream)
+        {
+            Byte[] bytes = new Byte[256];
+            String data;
+            int messageLength;
+
+            data = GetMessage(stream);
+            Model.ForceWidthHeight(int.Parse(data.Split(":")[1]), int.Parse(data.Split(":")[2]));
+            Model.CreateFields();
+            data = GetMessage(stream);
+            Model.ForceTurn((int.Parse(data.Split(":")[1])+1)%2);
+            Console.WriteLine("Set Turn to: {0}", Model.PlayersTurn);
+
+            ConsoleWriter cnsl = new();
+            cnsl.printToConsole(Model);
+
+
+
+
+            // Loop to receive all the data sent by the client.
+            while (Model.Active && (messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                // Translate data bytes to a ASCII string.
+                data = System.Text.Encoding.ASCII.GetString(bytes, 0, messageLength);
+                Console.WriteLine("Received: {0}", data);
+
+
+
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+                stream.Write(msg, 0, msg.Length);
+                Console.WriteLine("Sent: {0}", data);
+
+            }
+        }
+
+        private void SetupPlayerField(ConsoleWriter cnsl)
         {
 
         }

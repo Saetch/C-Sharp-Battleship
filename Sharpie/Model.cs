@@ -50,6 +50,10 @@ namespace Sharpie
 
         }
 
+        public int getVal(int x, int y, int player)
+        {
+            return player==1 ? OpponentField[x, y] : OwnField[x, y];
+        }
     }
 
 
