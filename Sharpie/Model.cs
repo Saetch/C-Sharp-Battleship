@@ -230,6 +230,10 @@ namespace Sharpie
 
         internal bool Space()
         {
+            if(Status == (int)StatusEnum.Playing)
+            {
+                return Enter();
+            }
             if(Status != (int)StatusEnum.SettingUp)
             {
                 return false;

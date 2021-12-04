@@ -24,8 +24,27 @@ namespace Sharpie
                 Int32 port = 1024;
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");
 
-                // TcpListener server = new TcpListener(port);
-                server = new TcpListener(localAddr, port);
+                Console.WriteLine("Listening for IPv4 or IPv6 address? [4/6]");
+                {
+                    String inp;
+                    while( true){
+                        inp = Console.ReadLine();
+                        if(String.Equals(inp, "4"))
+                        {
+                            server = new TcpListener(IPAddress.Any, port);
+                            break;
+                        }
+                        if(String.Equals(inp, "6"))
+                        {
+                            server = new TcpListener(IPAddress.IPv6Any, port);
+                            break;
+                        }
+                    }
+                    
+                }
+
+
+               
 
 
                 server.Start();
