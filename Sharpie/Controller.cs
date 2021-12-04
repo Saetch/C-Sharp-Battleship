@@ -21,11 +21,12 @@ namespace Sharpie
             bool run = true;
             try
             {
-                Int32 port = 13000;
+                Int32 port = 1024;
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");
 
                 // TcpListener server = new TcpListener(port);
                 server = new TcpListener(localAddr, port);
+
 
                 server.Start();
 
@@ -244,7 +245,10 @@ namespace Sharpie
         internal void StartGameClient(IPAddress targetAddress)
         {
             Console.Write("Connecting ... ");
-            TcpClient cl = new TcpClient(targetAddress.ToString(), 13000);
+            TcpClient cl = new TcpClient(targetAddress.ToString(), 1024);
+
+            //cl = new TcpClient(AddressFamily.InterNetworkV6);
+            //cl.Connect(targetAddress.ToString(), 13000);
             Console.Write("connected!\n");
 
             NetworkStream stream = cl.GetStream();
