@@ -60,7 +60,7 @@ namespace Sharpie
         static void BattleShipServer()
         {
             Console.WriteLine("Press any key to start ...!");
-            Console.ReadKey(false);
+            Console.ReadKey(true);
 
 
             int w =0;
@@ -263,8 +263,6 @@ namespace Sharpie
                             data = System.Text.Encoding.ASCII.GetString(bytes, 0, messageLength);
                             Console.WriteLine("Received: {0}", data);
 
-                            // Process the data sent by the client.
-                            data = data;
 
                             //randomize  string somewhat
                             string data2 = "";

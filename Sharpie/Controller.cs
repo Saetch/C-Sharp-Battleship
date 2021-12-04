@@ -64,8 +64,7 @@ namespace Sharpie
 
 
 
-
-            throw new NotImplementedException();
+            Console.ReadKey(true);
         }
 
 
@@ -83,27 +82,163 @@ namespace Sharpie
 
             SendMessage(stream, "B_FORCETURN:" + Model.PlayersTurn);
 
-            Console.WriteLine("Set Turn to: {0}", Model.PlayersTurn);
-          
-            ConsoleWriter cnsl = new();
 
+            ConsoleWriter cnsl = new();
+            cnsl.Headline = "Place your ships!";
+            cnsl.TailLine = "[W/A/S/D/Arrow keys] Move Ship  [Space] Change direction  [Enter] Place Ship";
+            Model.Activate();
+
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(false);
+            }
             cnsl.printToConsole(Model);
 
-            // Loop to receive all the data sent by the client.
-            while (Model.Active && (messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
+            while (Model.Status == (int)StatusEnum.SettingUp)
             {
-                // Translate data bytes to a ASCII string.
-                data = System.Text.Encoding.ASCII.GetString(bytes, 0, messageLength);
-                Console.WriteLine("Received: {0}", data);
+
+                data = Console.ReadKey(true).Key.ToString();
+                if (ProcessInput(data.ToLower()))
+                {
+                    cnsl.printToConsole(Model);
+                }
+            }
 
 
+            cnsl.printToConsole(Model);
+            Console.WriteLine("Waiting for your opponent to finish setting up ...");
 
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+            SendMessage(stream, "B_INITDONE_SYNC");
 
-                stream.Write(msg, 0, msg.Length);
-                Console.WriteLine("Sent: {0}", data);
+            data = GetMessage(stream);
+
+            if (!String.Equals(data, "B_INITDONE_SYNC"))
+            {
+                throw new InvalidOperationException();
+            }
+            cnsl.Headline = "Place your ships!";
+            cnsl.TailLine = "[W/A/S/D/Arrow keys] Move Ship  [Space] Change direction  [Enter] Place Ship";
+            cnsl.printToConsole(Model);
+
+            GameLoop(cnsl, data, stream);
+
+
+            
+        }
+
+
+        private void GameLoop(ConsoleWriter cnsl, String data, NetworkStream stream)
+        {
+            // Loop to receive all the data sent by the client.
+            while (Model.Status == (int)StatusEnum.Playing)
+            {
+                if (Model.PlayersTurn == 0) Model.StartFight();
+
+                while (Model.PlayersTurn == 0)
+                {
+                    while (Console.KeyAvailable)
+                    {
+                        Console.ReadKey(true);
+                    }
+                    cnsl.printToConsole(Model);
+
+                    data = Console.ReadKey(true).Key.ToString();
+                    if (ProcessInput(data.ToLower()))
+                    {
+                        cnsl.printToConsole(Model);
+                    }
+
+                    if (Model.PlayersTurn == 1)
+                    {
+                        Console.WriteLine("Sending ... " + "B_HITCOORD:" + Model.ObjectX + ":" + Model.ObjectY);
+                        SendMessage(stream, "B_HITCOORD:" + Model.ObjectX + ":" + Model.ObjectY);
+                        data = GetMessage(stream);
+                        if (String.Equals(data.Split(":")[1], "HIT"))
+                        {
+                            Model.Hit();
+                            if (String.Equals(data.Split(":")[2], "WON"))
+                            {
+                                cnsl.TailLine = "WON!";
+                                cnsl.Headline = "YOU WON!";
+                                Model.Won();
+                            }
+                        }
+                        else
+                        {
+                            Model.Miss();
+                        }
+                        cnsl.printToConsole(Model);
+                    }
+
+                }
+
+                data = GetMessage(stream);
+                if (data.StartsWith("B_HITCOORD:"))
+                {
+                    if (Model.CheckForHit(int.Parse(data.Split(":")[1]), int.Parse(data.Split(":")[2])))
+                    {
+                        String message = "B_HITCOORDANSWER:HIT";
+                        if (!Model.GotHit())
+                        {
+                            message += ":WON";
+                        }
+                        else
+                        {
+                            message += ":ONGOING";
+                        }
+                        SendMessage(stream, message);
+
+
+                    }
+                    else
+                    {
+                        SendMessage(stream, "B_HITCOORDANSWER:MISS");
+                    }
+                }
 
             }
+
+            if(Model.Hitpoints == 0)
+            {
+                cnsl.Headline = "You lost ...";
+                cnsl.TailLine = "Your fleet got destroyed!";
+            }
+            cnsl.printToConsole(Model);
+        }
+
+        private bool ProcessInput(string data)
+        {
+            switch (data)
+            {
+                case "w":
+
+                case "uparrow":
+                    Model.Up();
+                    break;
+                case "a":
+                case "leftarrow":
+                    Model.Left();
+                    break;
+                case "s":
+                case "downarrow":
+                    Model.Down();
+                    break;
+                case "d":
+                case "rightarrow":
+
+                    Model.Right();
+                    break;
+
+                case "spacebar":
+                    return Model.Space();
+
+                case "enter":
+                    Model.Enter();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
 
         internal void StartGameClient(IPAddress targetAddress)
@@ -116,6 +251,8 @@ namespace Sharpie
 
             CommunicationLoopC(stream);
 
+            cl.Close();
+            stream.Close();
         }
 
 
@@ -133,37 +270,48 @@ namespace Sharpie
             Console.WriteLine("Set Turn to: {0}", Model.PlayersTurn);
 
             ConsoleWriter cnsl = new();
+            cnsl.Headline = "Place your ships!";
+            cnsl.TailLine = "[W/A/S/D/Arrow keys] Move Ship  [Space] Change direction  [Enter] Place Ship";
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(false);
+            }
+            cnsl.printToConsole(Model);
+
+            while (Model.Status == (int)StatusEnum.SettingUp)
+            {
+
+                data = Console.ReadKey(true).Key.ToString();
+                if (ProcessInput(data.ToLower()))
+                {
+                    cnsl.printToConsole(Model);
+                }
+            }
+
+            cnsl.printToConsole(Model);
+            Console.WriteLine("Waiting for your opponent to finish setting up ...");
+
+            SendMessage(stream, "B_INITDONE_SYNC");
+
+            data = GetMessage(stream);
+
+            if(!String.Equals(data,"B_INITDONE_SYNC"))
+            {
+                throw new InvalidOperationException();
+            }
+            cnsl.Headline = "Hit the enemy Ships!";
+            cnsl.TailLine = "[W/A/S/D/Arrow keys] Move Target  [Enter] Attack Target";
             cnsl.printToConsole(Model);
 
 
-
-
-            // Loop to receive all the data sent by the client.
-            while (Model.Active && (messageLength = stream.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                // Translate data bytes to a ASCII string.
-                data = System.Text.Encoding.ASCII.GetString(bytes, 0, messageLength);
-                Console.WriteLine("Received: {0}", data);
-
-
-
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-                stream.Write(msg, 0, msg.Length);
-                Console.WriteLine("Sent: {0}", data);
-
-            }
-        }
-
-        private void SetupPlayerField(ConsoleWriter cnsl)
-        {
+            GameLoop(cnsl, data, stream);
 
         }
+
+
 
         private static void SendMessage(NetworkStream stream, String msg)
         {
-            Console.WriteLine("Sending ... " + msg);
-
             byte [] bytes = System.Text.Encoding.ASCII.GetBytes(msg);
             stream.Write(bytes, 0, bytes.Length);
         }
