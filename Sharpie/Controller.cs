@@ -94,7 +94,6 @@ namespace Sharpie
 
             Byte[] bytes = new Byte[256];
             String data;
-            int messageLength;
             Random r = new Random();
             ushort rnd = (ushort)(r.Next() % 2);
 
@@ -283,7 +282,6 @@ namespace Sharpie
         {
             Byte[] bytes = new Byte[256];
             String data;
-            int messageLength;
 
             data = GetMessage(stream);
             Model.ForceWidthHeight(int.Parse(data.Split(":")[1]), int.Parse(data.Split(":")[2]));
