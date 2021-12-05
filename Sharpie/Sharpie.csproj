@@ -14,4 +14,9 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="OpenTK" Version="4.6.7" />
+    <PackageReference Include="VulkanSharp" Version="0.1.10" />
+  </ItemGroup>
+
 </Project>

@@ -98,7 +98,12 @@ namespace Sharpie
             ushort rnd = (ushort)(r.Next() % 2);
 
             SendMessage(stream,"B_INIT:"+Model.Width+":"+Model.Height);
+            data = GetMessage(stream);
+            if(!String.Equals(data, "B_FIELDCREATED"))
+            {
 
+                throw new Exception();
+            }
             SendMessage(stream, "B_FORCETURN:" + Model.PlayersTurn);
 
 
@@ -280,12 +285,14 @@ namespace Sharpie
 
         private void CommunicationLoopC(NetworkStream stream)
         {
+            Byte[] rhombus = new byte[10];
             Byte[] bytes = new Byte[256];
             String data;
 
             data = GetMessage(stream);
             Model.ForceWidthHeight(int.Parse(data.Split(":")[1]), int.Parse(data.Split(":")[2]));
             Model.CreateFields();
+            SendMessage(stream, "B_FIELDCREATED");
             data = GetMessage(stream);
             Model.ForceTurn((int.Parse(data.Split(":")[1])+1)%2);
             Console.WriteLine("Set Turn to: {0}", Model.PlayersTurn);
@@ -342,7 +349,9 @@ namespace Sharpie
             byte[] bytes = new byte[256];
             int len = stream.Read(bytes, 0, bytes.Length);
             if (len == 0) return "";
-            return System.Text.Encoding.ASCII.GetString(bytes, 0, len);
+
+            String ret = System.Text.Encoding.ASCII.GetString(bytes, 0, len);
+            return ret;
         }
     }
 
